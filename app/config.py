@@ -1,0 +1,97 @@
+
+import os
+from pathlib import Path
+
+# Base paths
+BASE_DIR = Path(__file__).parent.parent
+UPLOAD_FOLDER = BASE_DIR / "uploads"
+SNAPSHOT_FOLDER = BASE_DIR / "snapshots"
+DATABASE_PATH = BASE_DIR / "database" / "accident.db"
+MODEL_PATH = BASE_DIR / "models"
+
+# Create directories
+for folder in [UPLOAD_FOLDER, SNAPSHOT_FOLDER, MODEL_PATH]:
+    folder.mkdir(parents=True, exist_ok=True)
+
+# Detection thresholds (from PPT)
+OVERLAP_THRESHOLD = 0.30  # 30% overlap
+SPEED_DROP_THRESHOLD = 0.50  # 50% speed drop
+CONFIDENCE_THRESHOLD = 0.60
+MIN_VEHICLES_FOR_ACCIDENT = 2
+
+# Severity thresholds (from PPT)
+SEVERITY_THRESHOLDS = {
+    'LOW': 65,
+    'MEDIUM': 85,
+    'HIGH': 100
+}
+
+# Model settings
+YOLO_MODEL = "yolov8n.pt"
+OPTICAL_FLOW_METHOD = "farneback"  # or "lucas_kanade"
+FRAME_SAMPLE_RATE = 5  # Process every 5th frame
+
+# Alert settings
+ALERT_COOLDOWN = 30  # seconds
+EMAIL_ENABLED = True
+SMS_ENABLED = False
+EMERGENCY_CONTACTS = {
+    "police": "100",
+    "ambulance": "108",
+    "fire": "101"
+}
+
+# API settings
+API_HOST = "0.0.0.0"
+API_PORT = 8000
+DEBUG = True
+
+# Performance metrics (from PPT)
+TARGET_ACCURACY = 94.2
+TARGET_RESPONSE_TIME = 1.3
+TRUE_POSITIVES = 235
+TRUE_NEGATIVES = 236
+FALSE_POSITIVES = 14
+FALSE_NEGATIVES = 15
+
+class Config:
+    """Configuration class"""
+    
+    # Paths
+    UPLOAD_FOLDER = UPLOAD_FOLDER
+    SNAPSHOT_FOLDER = SNAPSHOT_FOLDER
+    DATABASE_PATH = DATABASE_PATH
+    MODEL_PATH = MODEL_PATH
+    
+    # Detection
+    OVERLAP_THRESHOLD = OVERLAP_THRESHOLD
+    SPEED_DROP_THRESHOLD = SPEED_DROP_THRESHOLD
+    CONFIDENCE_THRESHOLD = CONFIDENCE_THRESHOLD
+    MIN_VEHICLES_FOR_ACCIDENT = MIN_VEHICLES_FOR_ACCIDENT
+    
+    # Severity
+    SEVERITY_THRESHOLDS = SEVERITY_THRESHOLDS
+    
+    # Model
+    YOLO_MODEL = YOLO_MODEL
+    OPTICAL_FLOW_METHOD = OPTICAL_FLOW_METHOD
+    FRAME_SAMPLE_RATE = FRAME_SAMPLE_RATE
+    
+    # Alert
+    ALERT_COOLDOWN = ALERT_COOLDOWN
+    EMAIL_ENABLED = EMAIL_ENABLED
+    SMS_ENABLED = SMS_ENABLED
+    EMERGENCY_CONTACTS = EMERGENCY_CONTACTS
+    
+    # API
+    API_HOST = API_HOST
+    API_PORT = API_PORT
+    DEBUG = DEBUG
+    
+    # Metrics
+    TARGET_ACCURACY = TARGET_ACCURACY
+    TARGET_RESPONSE_TIME = TARGET_RESPONSE_TIME
+    TRUE_POSITIVES = TRUE_POSITIVES
+    TRUE_NEGATIVES = TRUE_NEGATIVES
+    FALSE_POSITIVES = FALSE_POSITIVES
+    FALSE_NEGATIVES = FALSE_NEGATIVES
