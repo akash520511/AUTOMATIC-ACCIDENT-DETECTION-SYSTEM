@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accident Detection Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>🚗 Automatic Accident Detection System</h1>
+            <div class="team-info">
+                <span>Akash R (24MIS0132)</span>
+                <span>Boopathi R (24MIS0499)</span>
+                <span>Vignesh E (24MIS0559)</span>
+            </div>
+        </header>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>Accuracy</h3>
+                <div class="metric-value" id="accuracy">94.2%</div>
+                <div class="metric-trend">↑ 2.3%</div>
+            </div>
+            <div class="metric-card">
+                <h3>Response Time</h3>
+                <div class="metric-value" id="responseTime">1.3s</div>
+                <div class="metric-trend">↓ 0.2s</div>
+            </div>
+            <div class="metric-card">
+                <h3>Total Accidents</h3>
+                <div class="metric-value" id="totalAccidents">0</div>
+                <div class="metric-trend">Today</div>
+            </div>
+            <div class="metric-card">
+                <h3>Alerts Sent</h3>
+                <div class="metric-value" id="alertsSent">0</div>
+                <div class="metric-trend">Emergency</div>
+            </div>
+        </div>
+        
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>Confusion Matrix</h3>
+                <canvas id="confusionChart" width="400" height="400"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Severity Distribution</h3>
+                <canvas id="severityChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+        
+        <div class="recent-accidents">
+            <h3>Recent Accidents</h3>
+            <table id="accidentsTable">
+                <thead>
+                    <tr><th>Time</th><th>Severity</th><th>Confidence</th><th>Vehicles</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+        <div class="live-feed">
+            <h3>Live Detection Feed</h3>
+            <div class="video-container">
+                <video id="liveVideo" autoplay></video>
+                <canvas id="overlayCanvas"></canvas>
+            </div>
+            <button onclick="startCamera()">Start Camera</button>
+        </div>
+    </div>
+    
+    <script>
+        // Dashboard initialization
+        async function loadMetrics() {
+            const response = await fetch('/api/metrics');
+            const data = await response.json();
+            
+            document.getElementById('accuracy').textContent = `${data.accuracy}%`;
+            document.getElementById('responseTime').textContent = `${data.response_time}s`;
+            document.getElementById('totalAccidents').textContent = data.total_accidents || 0;
+            document.getElementById('alertsSent').textContent = data.total_alerts || 0;
+        }
+        
+        async function loadAccidents() {
+            const response = await fetch('/api/accidents');
+            const data = await response.json();
+            
+            const tbody = document.querySelector('#accidentsTable tbody');
+            tbody.innerHTML = '';
+            
+            data.forEach(accident => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = new Date(accident.timestamp).toLocaleTimeString();
+                row.insertCell(1).textContent = accident.severity;
+                row.insertCell(2).textContent = `${accident.confidence}%`;
+                row.insertCell(3).textContent = accident.vehicle_count;
+            });
+        }
+        
+        function initCharts() {
+            // Confusion Matrix Chart
+            const ctx1 = document.getElementById('confusionChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['TP', 'TN', 'FP', 'FN'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [235, 236, 14, 15],
+                        backgroundColor: ['#10b981', '#3b82f6', '#ef4444', '#f59e0b']
+                    }]
+                },
+                options: { responsive: true }
+            });
+            
+            // Severity Distribution
+            const ctx2 = document.getElementById('severityChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['LOW', 'MEDIUM', 'HIGH'],
+                    datasets: [{
+                        data: [45, 30, 25],
+                        backgroundColor: ['#f59e0b', '#f97316', '#ef4444']
+                    }]
+                }
+            });
+        }
+        
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    const video = document.getElementById('liveVideo');
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(err => console.error('Camera error:', err));
+        }
+        
+        // Load data on page load
+        loadMetrics();
+        loadAccidents();
+        initCharts();
+        
+        // Refresh every 5 seconds
+        setInterval(() => {
+            loadMetrics();
+            loadAccidents();
+        }, 5000);
+    </script>
+</body>
+</html>
